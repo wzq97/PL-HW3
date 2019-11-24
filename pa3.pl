@@ -1,9 +1,10 @@
 :- use_module(library(clpfd)).
 
-ps :- q2(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6),
-out(D1,D2,D3,D4).
 
-out(D1,D2,D3,D4) :- write(D1),write(','),write(D2),write(','),write(D3),write(','),write(D4).
+% out(D1,D2,D3,D4) :- format('~w,~w,~w,~w',[D1,D2,D3,D4]).
+
+out(D1,D2,D3,D4) :- % read(D1), 
+write($D1).
 
 q1(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6) :- D1 in 0..10000, D2 in 0..10000,
                               D3 in 0..10000, D4 in 0..10000,
@@ -22,5 +23,10 @@ q2(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6) :- q1(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6),
     D1 #\= 120, D2 #\= 120, D3 #\= 120, D4 #\= 120, 
     D1*D2+1 #= B1*B1,     D1*D3+1 #= B2*B2,
     D1*D4+1 #= B3*B3,     D2*D3+1 #= B4*B4,
-    D2*D4+1 #= B5*B5,     D3*D4+1 #= B6*B6.
-                        
+    D2*D4+1 #= B5*B5,     D3*D4+1 #= B6*B6, write($D1),!.
+
+
+main :- q2(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6),
+format('hello'),
+out(D1,D2,D3,D4),
+format('end').
