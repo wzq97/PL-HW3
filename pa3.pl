@@ -1,5 +1,7 @@
 :- use_module(library(clpfd)).
-                        
+
+main() :- q1(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6).
+
 q1(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6) :- D1 in 0..10000, D2 in 0..10000,
                               D3 in 0..10000, D4 in 0..10000,
                               B1 in 0..10001, B2 in 0..10001,
