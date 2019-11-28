@@ -23,4 +23,4 @@ q3(D1,D2,D3,D4) :-
     D1*D4+1 #= B3*B3,     D2*D3+1 #= B4*B4,
     D2*D4+1 #= B5*B5,     D3*D4+1 #= B6*B6.
 
-main :- q3(D1,D2,D3,D4), !, label([D1,D2,D3,D4]), format('~w,~w,~w,~w', [D1,D2,D3,D4]).
+main :- q3(D1,D2,D3,D4), !, label([D1,D2,D3,D4]), format('~w,~w,~w,~w', [D1,D2,D3,D4]),!.
