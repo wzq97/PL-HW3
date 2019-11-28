@@ -28,12 +28,10 @@ q3(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6) :-
     D1*D2+1 #= B1*B1,     D1*D3+1 #= B2*B2,
     D1*D4+1 #= B3*B3,     D2*D3+1 #= B4*B4,
     D2*D4+1 #= B5*B5,     D3*D4+1 #= B6*B6,
-    !,
-    write(D1).
+    ,write(D1),nl,!.
 
 main :- q3(D1,D2,D3,D4,B1,B2,B3,B4,B5,B6), !,
-format('hello '),
-write(D1), fail.
+format('hello '). 
 
 main2 :- main2_helper(X),
 %X in 0..10000,!,
