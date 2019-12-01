@@ -1,5 +1,56 @@
 :- use_module(library(clpfd)).
-:- initialization(main, main).
+
+% create a list with N elements
+build(X, N, List)  :- 
+    length(List, N), 
+    maplist(=(X), List).
+
+% sum up the list
+sum_list([], 0).
+sum_list([H|T], Sum) :-
+   sum_list(T, Rest),
+   Sum is H + Rest.
+
+testEven :-
+    X in 1..10,
+    label([X]),
+    constraint_Even([X]),
+    write(X).
+
+% make the list all even int
+constraint_Even([]).
+constraint_Even([H|T]) :-
+    H mod 2 #= 0,
+    constraint_Even(T).
+
+% make the list all even int
+constraint_Odd([]).
+constraint_Odd([H|T]) :-
+    H mod 2 #= 1,
+    constraint_Odd(T).
+
+% findSol_Even_Sum(even, 2, 10).
+findSol_Even_Sum(even, N, S) :- 
+    createList_To_Sum(List, N, S),
+    constraint_Even(List),
+    label(List), print_list(List).
+
+print_list([]).
+print_list([H|T]) :-
+    format('**printing list : ~w ~n', H),
+    print_list(T).
+
+% create a list of length N with distinct elements
+createList(F, N, S) :-
+    length(F, N),
+    F ins 1..S,
+    all_distinct(F).
+
+createList_To_Sum(F, N, S) :-
+    length(F, N),
+    F ins 1..S, sum(F, #=, S),
+    all_distinct(F).
+
 % "" -> string, ''->atom
 ip --> s.
 % i --> ['even'] | ['odd'] | ['both'].
