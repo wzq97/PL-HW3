@@ -1,21 +1,15 @@
 :- use_module(library(clpfd)).
 
-% create a list with N elements
-build(X, N, List)  :- 
-    length(List, N), 
-    maplist(=(X), List).
+% % create a list with N elements
+% build(X, N, List)  :- 
+%     length(List, N), 
+%     maplist(=(X), List).
 
-% sum up the list
-sum_list([], 0).
-sum_list([H|T], Sum) :-
-   sum_list(T, Rest),
-   Sum is H + Rest.
-
-testEven :-
-    X in 1..10,
-    label([X]),
-    constraint_Even([X]),
-    write(X).
+% % sum up the list
+% sum_list([], 0).
+% sum_list([H|T], Sum) :-
+%    sum_list(T, Rest),
+%    Sum is H + Rest.
 
 % make the list all even int
 constraint_Even([]).
@@ -29,47 +23,66 @@ constraint_Odd([H|T]) :-
     H mod 2 #= 1,
     constraint_Odd(T).
 
-% findSol_Even_Sum(even, 2, 10).
-findSol_Even_Sum(even, N, S) :- 
-    createList_To_Sum(List, N, S),
-    constraint_Even(List),
-    label(List), print_list(List).
-
+% helper
 print_list([]).
 print_list([H|T]) :-
     format('**printing list : ~w ~n', H),
     print_list(T).
 
-% create a list of length N with distinct elements
-createList(F, N, S) :-
-    length(F, N),
-    F ins 1..S,
-    all_distinct(F).
+print_Sol([]).
+print_Sol([H|T]) :-
+    format('~w,', H),
+    print_Sol(T).
+
+% % create a list of length N with distinct elements
+% createList(F, N, S) :-
+%     length(F, N),
+%     F ins 1..S,
+%     all_distinct(F).
 
 createList_To_Sum(F, N, S) :-
     length(F, N),
     F ins 1..S, sum(F, #=, S),
-    all_distinct(F).
+    all_distinct(F).    % make sure all elements are different
 
-% "" -> string, ''->atom
+% findSol_Even_Sum(2, 10).
+findSol_Even_Sum(N, S) :- 
+    createList_To_Sum(List, N, S),
+    constraint_Even(List),
+    label(List), 
+    write('At least one solution exists: '),
+    print_Sol(List).
+
+findSol_Odd_Sum(N, S) :- 
+    createList_To_Sum(List, N, S),
+    constraint_Odd(List),
+    label(List), print_Sol(List).
+
 ip --> s.
-% i --> ['even'] | ['odd'] | ['both'].
-% o --> ['sum'] | ['multiply'] | ['divide'].
-s --> ["Find"],["a"],["set"],["of"],i,["that"],op,["to"],number.
+s --> ["Find"],["a"],["set"],["of"],i,["that"],op,["to"],number(S).
 i --> even, ["integers"] | odd , ["integers"] | both, ["integers"].
 even --> num(N), ["even"].
 odd --> num(N), ["odd"].
 both --> even, ["and"], odd.
 num(N) --> [N].
 op --> ["sum"] | ["multiply"] | ["divide"].
-number --> [_].
+number(S) --> [S].
 
 % main("Find a set of 2 odd integers that sum to 16").
 main(Input) :- 
-    % read(String),
     split_string(Input, " ", " ", StringList),
-    % print
+    % DEBUG print
     forall(nth0(I, StringList, E), format('List[~w]=~w~n', [I, E])),
     
-    (phrase(ip, StringList) -> format('OK!'); format('Invalid String')
+    (phrase(ip, StringList) -> format('OK!~n'),
+    nth0(4,StringList,X),
+    number_codes(N,X),
+    format('5th elem is = ~w ~n', [N]),
+    nth0(10,StringList,Y),
+    number_codes(S,Y),
+    format('11th elem is = ~w ~n', [S]),
+    findSol_Even_Sum(N, S),
+    !
+    
+    ; format('Invalid String~n')
     ).
