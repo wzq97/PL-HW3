@@ -61,23 +61,28 @@ findSol_Odd_Sum(N, S) :-
     constraint_Odd(List),
     label(List), print_Sol(List).
 
+findSol_Both_Sum(N, S) :- 
+    createList_To_Sum(List, N, S),
+    label(List), 
+    write('At least one solution exists: '),
+    print_Sol(List).
 
 % //////////////////////////    PRODUCT /////////////////////////////////
-product_of_list([], 1).
-product_of_list([H|T], Product) :- product_of_list(T, Rest), Product is H * Rest.
-prod_list([],0).
-prod_list([H|T], Product) :- product_of_list([H|T], Product).
+% product_of_list([], 1).
+% product_of_list([H|T], Product) :- product_of_list(T, Rest), Product is H * Rest.
+% prod_list([],0).
+% prod_list([H|T], Product) :- product_of_list([H|T], Product).
 
-list_op_product(L, Op, P) :-
-    identity_element(Op, IE),
-    reverse(L, R), % no foldr in SWI-Prolog, at least
-    foldl(Op, R, IE, P).
+% list_op_product(L, Op, P) :-
+%     identity_element(Op, IE),
+%     reverse(L, R), % no foldr in SWI-Prolog, at least
+%     foldl(Op, R, IE, P).
 
-identity_element(add, 0).
-identity_element(mult, 1).
+% identity_element(add, 0).
+% identity_element(mult, 1).
 
-add(X, Y, R) :- R is X + Y.
-mult(X, Y, R) :- R is X * Y.
+% add(X, Y, R) :- R is X + Y.
+% mult(X, Y, R) :- R is X * Y.
 
 createList_To_Product([],0,1).
 createList_To_Product([X|Xs],Count,Product) :-
@@ -95,14 +100,24 @@ createList_To_Product([X|Xs],Count,Product) :-
 % findSol_Even_Product(2, 16).
 findSol_Even_Product(N, P) :- 
     createList_To_Product(List, N, P),
+    all_distinct(List),
     constraint_Even(List),
     label(List), 
     write('At least one solution exists: '),
     print_Sol(List).
 
+% findSol_Even_Product(2, 21).
 findSol_Odd_Product(N, P) :- 
     createList_To_Product(List, N, P),
+    all_distinct(List),
     constraint_Odd(List),
+    label(List), 
+    write('At least one solution exists: '),
+    print_Sol(List).
+
+findSol_Both_Product(N, S) :- 
+    createList_To_Sum(List, N, S),
+    all_distinct(List),
     label(List), 
     write('At least one solution exists: '),
     print_Sol(List).
