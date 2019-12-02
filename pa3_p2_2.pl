@@ -65,7 +65,7 @@ even --> num(N), ["even"].
 odd --> num(N), ["odd"].
 both --> even, ["and"], odd.
 num(N) --> [N].
-op --> ["sum"] | ["multiply"] | ["divide"].
+op --> ["sum"] | ["multiply"].
 number(S) --> [S].
 
 % main("Find a set of 2 odd integers that sum to 16").
