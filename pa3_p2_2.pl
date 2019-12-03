@@ -30,6 +30,7 @@ print_list([H|T]) :-
     print_list(T).
 
 print_Sol([]).
+print_Sol([H|[]]) :- format('~w', H).
 print_Sol([H|T]) :-
     format('~w,', H),
     print_Sol(T).
@@ -116,7 +117,7 @@ findSol_Odd_Product(N, P) :-
     print_Sol(List).
 
 findSol_Both_Product(N, S) :- 
-    createList_To_Sum(List, N, S),
+    createList_To_Product(List, N, S),
     all_distinct(List),
     label(List), 
     write('At least one solution exists: '),
