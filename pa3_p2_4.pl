@@ -144,13 +144,12 @@ op --> ["sum"] | ["multiply"].
 number(S) --> [S].
 
 % main("Find a set of 2 odd integers that sum to 16").
-main([Input]) :- 
-    atom_string(Input, S),
-    split_string(S, " ", " ", StringList),
+main(Input) :- 
+    split_string(Input, " ", " ", StringList),
     % DEBUG print
     %forall(nth0(I, StringList, E), format('List[~w]=~w~n', [I, E])),
     
-    (phrase(ip, StringList) ->
+    (phrase(ip, StringList) -> format('OK!~n'),
         nth0(4,StringList,N1_S),
         number_codes(N1,N1_S),
         nth0(6,StringList,I),
@@ -161,11 +160,9 @@ main([Input]) :-
             nth0(13,StringList,Num_S),
             number_codes(Num,Num_S),
             (OP =="sum" ->
-                (findSol_Both_Sum(N1,N2,Num)->!
-                ;format('No Solution~n'));
+                findSol_Both_Sum(N1,N2,Num)->!;
             OP == "multiply" ->
-                (findSol_Both_Product(N1,N2,Num)->!
-                ;format('No Solution~n'))
+                findSol_Both_Product(N1,N2,Num)->!
             )
         ;
             % i != and
@@ -174,18 +171,13 @@ main([Input]) :-
             nth0(10,StringList,Num_S),
             number_codes(Num,Num_S),
             (OP == "sum", EO == "even" ->
-                (findSol_Even_Sum(N1,Num)-> !
-                ;format('No Solution~n'));
+                findSol_Even_Sum(N1,Num)->!;
             OP == "multiply", EO == "even" ->
-                (findSol_Even_Product(N1,Num)->!
-                ;format('No Solution~n'));
+                findSol_Even_Product(N1,Num)->!;
             OP == "sum", EO == "odd" ->
-                (findSol_Odd_Sum(N1,Num)->!
-                ;format('No Solution~n'));
+                findSol_Odd_Sum(N1,Num)->!;
             OP == "multiply", EO == "odd" ->
-                (findSol_Odd_Product(N1,Num)->!
-                ;format('No Solution~n'))
-
+                findSol_Odd_Product(N1,Num)->!
             )
         )
         

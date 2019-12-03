@@ -23,12 +23,6 @@ constraint_Odd([H|T]) :-
     H mod 2 #= 1,
     constraint_Odd(T).
 
-% helper
-print_list([]).
-print_list([H|T]) :-
-    format('**printing list : ~w ~n', H),
-    print_list(T).
-
 print_Sol([]).
 print_Sol([H|[]]) :- format('~w', H).
 print_Sol([H|T]) :-
@@ -63,7 +57,7 @@ findSol_Even_Sum(N, S) :-
     constraint_Even(List),
     all_distinct(List),
     label(List), 
-    write('At least one solution exists: '),
+    %write('At least one solution exists: '),
     print_Sol(List).
 
 findSol_Odd_Sum(N, S) :- 
@@ -90,7 +84,7 @@ findSol_Even_Product(N, P) :-
     all_distinct(List),
     constraint_Even(List),
     label(List), 
-    write('At least one solution exists: '),
+    %write('At least one solution exists: '),
     print_Sol(List).
 
 % findSol_Even_Product(2, 21).
@@ -99,7 +93,7 @@ findSol_Odd_Product(N, P) :-
     all_distinct(List),
     constraint_Odd(List),
     label(List), 
-    write('At least one solution exists: '),
+    %write('At least one solution exists: '),
     print_Sol(List).
 
 findSol_Both_Sum(N1, N2, S) :- 
@@ -112,7 +106,7 @@ findSol_Both_Sum(N1, N2, S) :-
     S #= S1+S2,
     label(List1), 
     label(List2), 
-    write('At least one solution exists: '),
+    %write('At least one solution exists: '),
     print_Sol(List1),
     write(','),
     print_Sol(List2).
@@ -128,25 +122,25 @@ findSol_Both_Product(N1, N2, P) :-
     P #= P1*P2,
     label(List1),
     label(List2),
-    write('At least one solution exists: '),
+    %write('At least one solution exists: '),
     print_Sol(List1),
     write(','),
     print_Sol(List2).
 
 ip --> s.
-s --> ["Find"],["a"],["set"],["of"],i,["that"],op,["to"],number(S).
+s --> ["Find"],["a"],["set"],["of"],i,["that"],op,["to"],number.
 i --> even, ["integers"] | odd , ["integers"] | both, ["integers"].
-even --> num(N), ["even"].
-odd --> num(N), ["odd"].
+even --> num, ["even"].
+odd --> num, ["odd"].
 both --> even, ["and"], odd.
-num(N) --> [N].
+num --> [_].
 op --> ["sum"] | ["multiply"].
-number(S) --> [S].
+number --> [_].
 
 % main("Find a set of 2 odd integers that sum to 16").
 main([Input]) :- 
     atom_string(Input, S),
-    split_string(S, " ", " ", StringList),
+    split_string(S, ' ', '', StringList),
     % DEBUG print
     %forall(nth0(I, StringList, E), format('List[~w]=~w~n', [I, E])),
     
