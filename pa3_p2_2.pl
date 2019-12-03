@@ -43,16 +43,25 @@ print_Sol([H|T]) :-
 
 % ////////////////////  SUM   //////////////////////////
 
+createList_To_Sum([],0,0).
+createList_To_Sum([X|Xs],Count,Sum) :-
+    Count #>= 1,
+    X   #>= 1,
+    X in 1..128,
+    Sum #=  X+Sum0,
+    Newcount is Count-1,
+    createList_To_Sum(Xs,Newcount,Sum0).
 
-createList_To_Sum(F, N, S) :-
-    length(F, N),
-    F ins 1..S, sum(F, #=, S),
-    all_distinct(F).    % make sure all elements are different
+% createList_To_Sum(F, N, S) :-
+%     length(F, N),
+%     F ins 1..inf, sum(F, #=, S),
+%     all_distinct(F).    % make sure all elements are different
 
 % findSol_Even_Sum(2, 10).
 findSol_Even_Sum(N, S) :- 
     createList_To_Sum(List, N, S),
     constraint_Even(List),
+    all_distinct(List),
     label(List), 
     write('At least one solution exists: '),
     print_Sol(List).
@@ -60,31 +69,12 @@ findSol_Even_Sum(N, S) :-
 findSol_Odd_Sum(N, S) :- 
     createList_To_Sum(List, N, S),
     constraint_Odd(List),
+    all_distinct(List),
     label(List), print_Sol(List).
 
-findSol_Both_Sum(N, S) :- 
-    createList_To_Sum(List, N, S),
-    label(List), 
-    write('At least one solution exists: '),
-    print_Sol(List).
+
 
 % //////////////////////////    PRODUCT /////////////////////////////////
-% product_of_list([], 1).
-% product_of_list([H|T], Product) :- product_of_list(T, Rest), Product is H * Rest.
-% prod_list([],0).
-% prod_list([H|T], Product) :- product_of_list([H|T], Product).
-
-% list_op_product(L, Op, P) :-
-%     identity_element(Op, IE),
-%     reverse(L, R), % no foldr in SWI-Prolog, at least
-%     foldl(Op, R, IE, P).
-
-% identity_element(add, 0).
-% identity_element(mult, 1).
-
-% add(X, Y, R) :- R is X + Y.
-% mult(X, Y, R) :- R is X * Y.
-
 createList_To_Product([],0,1).
 createList_To_Product([X|Xs],Count,Product) :-
     Count #>= 1,
@@ -93,10 +83,6 @@ createList_To_Product([X|Xs],Count,Product) :-
     Product #=  X*Product0,
     Newcount is Count-1,
     createList_To_Product(Xs,Newcount,Product0).
-% createList_To_Product(F, N, P) :-
-%     length(F, N),
-%     F ins 1..P, scalar_product(+Cs, +Vs, +Rel, P),%prod_list(F, P),% Product#=M,
-%     all_distinct(F).    % make sure all elements are different
 
 % findSol_Even_Product(2, 16).
 findSol_Even_Product(N, P) :- 
@@ -116,12 +102,36 @@ findSol_Odd_Product(N, P) :-
     write('At least one solution exists: '),
     print_Sol(List).
 
-findSol_Both_Product(N, S) :- 
-    createList_To_Product(List, N, S),
-    all_distinct(List),
-    label(List), 
+findSol_Both_Sum(N1, N2, S) :- 
+    createList_To_Sum(List1, N1, S1),
+    constraint_Even(List1),
+    all_distinct(List1),
+    createList_To_Sum(List2, N2, S2),
+    constraint_Odd(List2),
+    all_distinct(List2),
+    S #= S1+S2,
+    label(List1), 
+    label(List2), 
     write('At least one solution exists: '),
-    print_Sol(List).
+    print_Sol(List1),
+    write(','),
+    print_Sol(List2).
+
+
+findSol_Both_Product(N1, N2, P) :- 
+    createList_To_Product(List1, N1, P1),
+    constraint_Even(List1),
+    all_distinct(List1),
+    createList_To_Product(List2, N2, P2),
+    constraint_Odd(List2),
+    all_distinct(List2),
+    P #= P1*P2,
+    label(List1),
+    label(List2),
+    write('At least one solution exists: '),
+    print_Sol(List1),
+    write(','),
+    print_Sol(List2).
 
 ip --> s.
 s --> ["Find"],["a"],["set"],["of"],i,["that"],op,["to"],number(S).
@@ -137,17 +147,47 @@ number(S) --> [S].
 main(Input) :- 
     split_string(Input, " ", " ", StringList),
     % DEBUG print
-    forall(nth0(I, StringList, E), format('List[~w]=~w~n', [I, E])),
+    %forall(nth0(I, StringList, E), format('List[~w]=~w~n', [I, E])),
     
     (phrase(ip, StringList) -> format('OK!~n'),
-    nth0(4,StringList,X),
-    number_codes(N,X),
-    format('5th elem is = ~w ~n', [N]),
-    nth0(10,StringList,Y),
-    number_codes(S,Y),
-    format('11th elem is = ~w ~n', [S]),
-    findSol_Even_Sum(N, S),
-    !
-    ; phrase(ip, StringList) -> format(' No Solution~n')
+        nth0(4,StringList,N1_S),
+        number_codes(N1,N1_S),
+        nth0(6,StringList,I),
+        (I == "and" -> 
+            nth0(11,StringList,OP),
+            nth0(7,StringList,N2_S),
+            number_codes(N2,N2_S),
+            nth0(13,StringList,Num_S),
+            number_codes(Num,Num_S),
+            (OP =="sum" ->
+                (findSol_Both_Sum(N1,N2,Num)->!
+                ;format('No Solution~n'));
+            OP == "multiply" ->
+                (findSol_Both_Product(N1,N2,Num)->!
+                ;format('No Solution~n'))
+            )
+        ;
+            % i != and
+            nth0(8,StringList,OP),
+            nth0(5,StringList,EO),
+            nth0(10,StringList,Num_S),
+            number_codes(Num,Num_S),
+            (OP == "sum", EO == "even" ->
+                (findSol_Even_Sum(N1,Num)-> !
+                ;format('No Solution~n'));
+            OP == "multiply", EO == "even" ->
+                (findSol_Even_Product(N1,Num)->!
+                ;format('No Solution~n'));
+            OP == "sum", EO == "odd" ->
+                (findSol_Odd_Sum(N1,Num)->!
+                ;format('No Solution~n'));
+            OP == "multiply", EO == "odd" ->
+                (findSol_Odd_Product(N1,Num)->!
+                ;format('No Solution~n'))
+
+            )
+        )
+        
+    ; phrase(ip, StringList) -> format('No Solution~n')
     ; format('Invalid String~n')
     ).
