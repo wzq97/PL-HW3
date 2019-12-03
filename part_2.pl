@@ -1,42 +1,26 @@
 :- use_module(library(clpfd)).
 
-% % create a list with N elements
-% build(X, N, List)  :- 
-%     length(List, N), 
-%     maplist(=(X), List).
-
-% % sum up the list
-% sum_list([], 0).
-% sum_list([H|T], Sum) :-
-%    sum_list(T, Rest),
-%    Sum is H + Rest.
-
-% make the list all even int
+% constraint the list with all even integers
 constraint_Even([]).
 constraint_Even([H|T]) :-
     H mod 2 #= 0,
     constraint_Even(T).
 
-% make the list all even int
+% constraint the list with all odd integers
 constraint_Odd([]).
 constraint_Odd([H|T]) :-
     H mod 2 #= 1,
     constraint_Odd(T).
 
+% print output
 print_Sol([]).
 print_Sol([H|[]]) :- format('~w', H).
 print_Sol([H|T]) :-
     format('~w,', H),
     print_Sol(T).
 
-% % create a list of length N with distinct elements
-% createList(F, N, S) :-
-%     length(F, N),
-%     F ins 1..S,
-%     all_distinct(F).
-
-% ////////////////////  SUM   //////////////////////////
-
+% //////////////////// SUM //////////////////////////
+% create a list with a desire count and sum
 createList_To_Sum([],0,0).
 createList_To_Sum([X|Xs],Count,Sum) :-
     Count #>= 1,
@@ -46,56 +30,25 @@ createList_To_Sum([X|Xs],Count,Sum) :-
     Newcount is Count-1,
     createList_To_Sum(Xs,Newcount,Sum0).
 
-% createList_To_Sum(F, N, S) :-
-%     length(F, N),
-%     F ins 1..inf, sum(F, #=, S),
-%     all_distinct(F).    % make sure all elements are different
-
-% findSol_Even_Sum(2, 10).
+% function that called by main to find list with N number of
+% even integers that sum up to S
 findSol_Even_Sum(N, S) :- 
     createList_To_Sum(List, N, S),
     constraint_Even(List),
     all_distinct(List),
-    label(List), 
-    %write('At least one solution exists: '),
+    label(List),
     print_Sol(List).
 
+% function that called by main to find list with N number of
+% odd integers that sum up to S
 findSol_Odd_Sum(N, S) :- 
     createList_To_Sum(List, N, S),
     constraint_Odd(List),
     all_distinct(List),
     label(List), print_Sol(List).
 
-
-
-% //////////////////////////    PRODUCT /////////////////////////////////
-createList_To_Product([],0,1).
-createList_To_Product([X|Xs],Count,Product) :-
-    Count #>= 1,
-    X   #>= 1,
-    X in 1..128,
-    Product #=  X*Product0,
-    Newcount is Count-1,
-    createList_To_Product(Xs,Newcount,Product0).
-
-% findSol_Even_Product(2, 16).
-findSol_Even_Product(N, P) :- 
-    createList_To_Product(List, N, P),
-    all_distinct(List),
-    constraint_Even(List),
-    label(List), 
-    %write('At least one solution exists: '),
-    print_Sol(List).
-
-% findSol_Even_Product(2, 21).
-findSol_Odd_Product(N, P) :- 
-    createList_To_Product(List, N, P),
-    all_distinct(List),
-    constraint_Odd(List),
-    label(List), 
-    %write('At least one solution exists: '),
-    print_Sol(List).
-
+% function that called by main to find list with N number of
+% both even and odd integers that sum up to S
 findSol_Both_Sum(N1, N2, S) :- 
     createList_To_Sum(List1, N1, S1),
     constraint_Even(List1),
@@ -105,13 +58,42 @@ findSol_Both_Sum(N1, N2, S) :-
     all_distinct(List2),
     S #= S1+S2,
     label(List1), 
-    label(List2), 
-    %write('At least one solution exists: '),
+    label(List2),
     print_Sol(List1),
     write(','),
     print_Sol(List2).
 
+% ////////////////////////// PRODUCT/////////////////////////////////
+% create a list with a desire count and product
+createList_To_Product([],0,1).
+createList_To_Product([X|Xs],Count,Product) :-
+    Count #>= 1,
+    X   #>= 1,
+    X in 1..128,
+    Product #=  X*Product0,
+    Newcount is Count-1,
+    createList_To_Product(Xs,Newcount,Product0).
 
+% function that called by main to find list with N number of
+% even integers that have a product of P
+findSol_Even_Product(N, P) :- 
+    createList_To_Product(List, N, P),
+    all_distinct(List),
+    constraint_Even(List),
+    label(List),
+    print_Sol(List).
+
+% function that called by main to find list with N number of
+% odd integers that have a product of P
+findSol_Odd_Product(N, P) :- 
+    createList_To_Product(List, N, P),
+    all_distinct(List),
+    constraint_Odd(List),
+    label(List),
+    print_Sol(List).
+
+% function that called by main to find list with N number of
+% both even and odd integers that have a product of P
 findSol_Both_Product(N1, N2, P) :- 
     createList_To_Product(List1, N1, P1),
     constraint_Even(List1),
@@ -122,11 +104,11 @@ findSol_Both_Product(N1, N2, P) :-
     P #= P1*P2,
     label(List1),
     label(List2),
-    %write('At least one solution exists: '),
     print_Sol(List1),
     write(','),
     print_Sol(List2).
 
+% sentence parsing grammar
 ip --> s.
 s --> ["Find"],["a"],["set"],["of"],i,["that"],op,["to"],number.
 i --> even, ["integers"] | odd , ["integers"] | both, ["integers"].
@@ -137,52 +119,52 @@ num --> [_].
 op --> ["sum"] | ["multiply"].
 number --> [_].
 
-% main("Find a set of 2 odd integers that sum to 16").
+
 main([Input]) :- 
     atom_string(Input, S),
     split_string(S, ' ', '', StringList),
-    % DEBUG print
-    %forall(nth0(I, StringList, E), format('List[~w]=~w~n', [I, E])),
-    
+    % check if the input string can be parsed
+    % if yes, try to find solution
+    % otherwise, it is an invalid string
     (phrase(ip, StringList) ->
-        nth0(4,StringList,N1_S),
+        nth0(4,StringList,N1_S),        % read in the number and convert
         number_codes(N1,N1_S),
         nth0(6,StringList,I),
-        (I == "and" -> 
-            nth0(11,StringList,OP),
-            nth0(7,StringList,N2_S),
+        % if the 7th word is "and", do find solution for both even and odd
+        (I == "and" ->
+            nth0(11,StringList,OP),     % read in the operation and number 
+            nth0(7,StringList,N2_S),    % that needs to sum/multiply to
             number_codes(N2,N2_S),
             nth0(13,StringList,Num_S),
             number_codes(Num,Num_S),
-            (OP =="sum" ->
+            (OP =="sum" ->              % operation is sum
                 (findSol_Both_Sum(N1,N2,Num)->!
-                ;format('No Solution~n'));
-            OP == "multiply" ->
+                ;format('No Solution~n'));  %if there's no solution
+            OP == "multiply" ->         % operation is multiply
                 (findSol_Both_Product(N1,N2,Num)->!
-                ;format('No Solution~n'))
+                ;format('No Solution~n'))   %if there's no solution
             )
         ;
-            % i != and
-            nth0(8,StringList,OP),
-            nth0(5,StringList,EO),
+            % when there is no "and", it means find solution for only even OR odd integers
+            nth0(8,StringList,OP),      % read in the operation and number 
+            nth0(5,StringList,EO),      % read in whether to find even or odd 
             nth0(10,StringList,Num_S),
             number_codes(Num,Num_S),
-            (OP == "sum", EO == "even" ->
+            (OP == "sum", EO == "even" ->   % operation is sum with only even int
                 (findSol_Even_Sum(N1,Num)-> !
                 ;format('No Solution~n'));
-            OP == "multiply", EO == "even" ->
+            OP == "multiply", EO == "even" ->   % operation is multiply with only even int
                 (findSol_Even_Product(N1,Num)->!
                 ;format('No Solution~n'));
-            OP == "sum", EO == "odd" ->
+            OP == "sum", EO == "odd" ->     % operation is sum with only odd int
                 (findSol_Odd_Sum(N1,Num)->!
                 ;format('No Solution~n'));
-            OP == "multiply", EO == "odd" ->
+            OP == "multiply", EO == "odd" ->    % operation is multiply with only odd int
                 (findSol_Odd_Product(N1,Num)->!
                 ;format('No Solution~n'))
-
             )
         )
         
     ; phrase(ip, StringList) -> format('No Solution~n')
-    ; format('Invalid String~n')
+    ; format('Invalid String~n')    % sentence can not be parsed by the grammer, then invalid
     ).
